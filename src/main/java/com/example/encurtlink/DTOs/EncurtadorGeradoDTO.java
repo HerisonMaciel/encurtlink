@@ -15,4 +15,6 @@ public class EncurtadorGeradoDTO {
 
     private LocalDateTime created_ad;
 
+    private int access;
+
 }

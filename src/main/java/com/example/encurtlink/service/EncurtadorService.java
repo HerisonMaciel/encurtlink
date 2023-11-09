@@ -52,7 +52,10 @@ public class EncurtadorService {
         Optional<EncurtadorGerado> encurtadorGeradoOptional = encurtadorRepository.findById(alias);
         try {
             if(encurtadorGeradoOptional.isPresent()){
-                EncurtadorGeradoResponse encurtadorGeradoResponse = EncurtadorMapper.toResponse(encurtadorGeradoOptional.get());
+                EncurtadorGerado encurtadorGerado = encurtadorGeradoOptional.get();
+                encurtadorGerado.setAccess(encurtadorGeradoOptional.get().getAccess()+1);
+                EncurtadorGerado encurtadorSave = encurtadorRepository.save(encurtadorGerado);
+                EncurtadorGeradoResponse encurtadorGeradoResponse = EncurtadorMapper.toResponse(encurtadorSave);
                 return encurtadorGeradoResponse;
             }
             throw new ExceptionAlias(alias, variaveisGlobais.getErrCode002(), variaveisGlobais.getDescriptionNoExists());

@@ -84,8 +84,8 @@ public class EncurtadorController {
             @ApiResponse(responseCode = "400", description = "Request invalid!"),
             @ApiResponse(responseCode = "404", description = "Not found"),
     })
-    @GetMapping("/consultAll")
-    public List<EncurtadorGerado> consultAll(){
-        return encurtadorRepository.findAll();
+    @GetMapping("/consultTop10")
+    public List<EncurtadorGerado> consultTop10(){
+        return encurtadorRepository.findTop10ByOrderByAccessDesc();
     }
 }

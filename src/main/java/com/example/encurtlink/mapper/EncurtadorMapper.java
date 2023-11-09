@@ -11,6 +11,7 @@ public class EncurtadorMapper {
                 .id_alias(encurtadorGeradoDTO.getId_alias())
                 .original_url(encurtadorGeradoDTO.getOriginal_url())
                 .created_ad(encurtadorGeradoDTO.getCreated_ad())
+                .access(encurtadorGeradoDTO.getAccess())
                 .build();
     }
 
@@ -18,6 +19,7 @@ public class EncurtadorMapper {
         return EncurtadorGeradoResponse.builder()
                 .alias(encurtadorGerado.getId_alias())
                 .url(encurtadorGerado.getOriginal_url())
+                .access(encurtadorGerado.getAccess())
                 .build();
     }
 

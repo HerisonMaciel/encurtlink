@@ -13,6 +13,7 @@ public class EncurtadorGeradoResponse {
 
     private String alias;
     private String url;
+    private int access;
     private StatisticsResponse statisticsResponse;
 
 }
