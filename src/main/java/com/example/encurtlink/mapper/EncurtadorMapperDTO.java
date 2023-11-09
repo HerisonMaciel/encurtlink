@@ -7,7 +7,8 @@ public class EncurtadorMapperDTO {
 
     public static EncurtadorGeradoDTO toDto(EncurtadorGeradoRequest encurtadorGeradoRequest){
         return EncurtadorGeradoDTO.builder()
-                .original_url(encurtadorGeradoRequest.getOriginal_url())
+                .original_url(encurtadorGeradoRequest.original_url())
+                .id_alias(encurtadorGeradoRequest.alias())
                 .build();
     }
 

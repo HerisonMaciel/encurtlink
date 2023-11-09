@@ -2,43 +2,105 @@ package com.example.encurtlink.service;
 
 import com.example.encurtlink.DTOs.EncurtadorGeradoDTO;
 import com.example.encurtlink.entity.EncurtadorGerado;
+import com.example.encurtlink.exception.ExceptionAlias;
 import com.example.encurtlink.mapper.EncurtadorMapper;
+import com.example.encurtlink.repository.EncurtadorRepository;
+import com.example.encurtlink.response.EncurtadorGeradoResponse;
+import com.example.encurtlink.utils.VariaveisGlobais;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Log4j2
 @AllArgsConstructor
 @Service
 public class EncurtadorService {
 
-    private final int MINLENGTH = 5;
-    private final int MAXLENGTH = 9;
+    @Autowired
+    private EncurtadorRepository encurtadorRepository;
 
-    public EncurtadorGerado genereteUrl(EncurtadorGeradoDTO encurtadorGeradoDTO){
+    @Autowired
+    private VariaveisGlobais variaveisGlobais;
 
-        long startTime = System.currentTimeMillis();
+    private static final int MINLENGTH = 5;
+    private static final int MAXLENGTH = 9;
+
+    public EncurtadorGeradoResponse genereteUrl(EncurtadorGeradoDTO encurtadorGeradoDTO) throws Exception {
+        if(encurtadorGeradoDTO.getId_alias() != null){
+            log.info("Possui Alias: " + encurtadorGeradoDTO);
+            return SavaAlias(encurtadorGeradoDTO);
+        }
+        log.info("Não possui Alias: " + encurtadorGeradoDTO);
+        return SaveAliasRandom(encurtadorGeradoDTO);
+    }
+
+    private boolean VerificationAlias(String alias){
+        Optional<EncurtadorGerado> encurtadorGerado = encurtadorRepository.findById(alias);
+        if(encurtadorGerado.isPresent()){
+            log.info("Alias já existe!");
+            return true;
+        }
+        log.info("Alias Não existe!");
+        return false;
+    }
+
+    public EncurtadorGeradoResponse ConsultAlias(String alias) throws Exception {
+        Optional<EncurtadorGerado> encurtadorGeradoOptional = encurtadorRepository.findById(alias);
+        try {
+            if(encurtadorGeradoOptional.isPresent()){
+                EncurtadorGeradoResponse encurtadorGeradoResponse = EncurtadorMapper.toResponse(encurtadorGeradoOptional.get());
+                return encurtadorGeradoResponse;
+            }
+            throw new ExceptionAlias(alias, variaveisGlobais.getErrCode002(), variaveisGlobais.getDescriptionNoExists());
+        }catch (ExceptionAlias e){
+            throw e;
+        }
+    }
+
+    private EncurtadorGeradoResponse SavaAlias(EncurtadorGeradoDTO encurtadorGeradoDTO) throws Exception {
+
+        try{
+            if(VerificationAlias(encurtadorGeradoDTO.getId_alias())){
+                throw new ExceptionAlias(encurtadorGeradoDTO.getId_alias(), variaveisGlobais.getErrCode001(), variaveisGlobais.getDescriptionExists());
+            }
+        }catch (ExceptionAlias e){
+            throw e;
+        }
+        encurtadorGeradoDTO.setCreated_ad(LocalDateTime.now());
+        EncurtadorGerado encurtadorGerado = EncurtadorMapper.toEntity(encurtadorGeradoDTO);
+        EncurtadorGerado encurtadorSave = encurtadorRepository.save(encurtadorGerado);
+        EncurtadorGeradoResponse encurtadorGeradoResponse = EncurtadorMapper.toResponse(encurtadorSave);
+        return encurtadorGeradoResponse;
+    }
 
 
-        encurtadorGeradoDTO.setId_hash(randomHash());
+    private EncurtadorGeradoResponse SaveAliasRandom(EncurtadorGeradoDTO encurtadorGeradoDTO){
+
+        boolean existe = true;
+        while (existe){
+            encurtadorGeradoDTO.setId_alias(randomAlias());
+            if(!VerificationAlias(encurtadorGeradoDTO.getId_alias())){
+                existe = false;
+                log.info("Alias criado com sucesso!");
+            }
+        }
+
         encurtadorGeradoDTO.setCreated_ad(LocalDateTime.now());
 
         EncurtadorGerado encurtadorGerado = EncurtadorMapper.toEntity(encurtadorGeradoDTO);
 
+        EncurtadorGerado encurtadorSave = encurtadorRepository.save(encurtadorGerado);
 
+        EncurtadorGeradoResponse encurtadorGeradoResponse = EncurtadorMapper.toResponse(encurtadorSave);
 
-        // Realize a operação de processamento da requisição aqui
-
-        long endTime = System.currentTimeMillis();
-        long tempoDecorrido = endTime - startTime;
-        log.info("Tempo Percorrido: " + tempoDecorrido);
-
-        return encurtadorGerado;
+        return encurtadorGeradoResponse;
     }
 
-    private String randomHash(){
+    private String randomAlias(){
         SecureRandom random = new SecureRandom();
         int length = random.nextInt(MAXLENGTH - MINLENGTH + 1) + MINLENGTH;
 
@@ -47,6 +109,8 @@ public class EncurtadorService {
 
         String randomBase64Combination = java.util.Base64.getEncoder().encodeToString(randomBytes);
         randomBase64Combination = randomBase64Combination.substring(0, length);
+        randomBase64Combination = randomBase64Combination.replace("+", "-").replace("/", "_").replace("%", "");
+
         return randomBase64Combination;
     }
 

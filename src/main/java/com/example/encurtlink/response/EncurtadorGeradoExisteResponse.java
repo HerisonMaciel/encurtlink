@@ -9,10 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class EncurtadorGeradoResponse {
-
+public class EncurtadorGeradoExisteResponse{
     private String alias;
-    private String url;
-    private StatisticsResponse statisticsResponse;
+    private int err_code;
+    private String description;
 
 }

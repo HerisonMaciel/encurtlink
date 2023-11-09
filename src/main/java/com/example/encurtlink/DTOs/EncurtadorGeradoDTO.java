@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Data
 public class EncurtadorGeradoDTO {
 
-    private String id_hash;
+    private String id_alias;
 
     private String original_url;
 

@@ -1,0 +1,19 @@
+version: "5"
+services:
+  encurtador:
+    image: mongo:latest
+    container_name: "encurtador"
+    ports:
+      - 27017:27017
+  encurtadorlink:
+    image: encurtadorlink:latest
+    container_name: "encurtadorlink"
+    ports:
+      - 9090:8080
+  encurtadorlink2:
+    image: encurtadorlink:latest
+    container_name: "encurtadorlink2"
+    ports:
+      - 9091:8080
+    links:
+      - encurtador
