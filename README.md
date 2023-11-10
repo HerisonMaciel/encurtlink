@@ -19,6 +19,9 @@ ApiRest
 - GET:  http://localhost:9090/encurtador/ConsultAlias?alias=teste
 - http://localhost:9090/encurtador/consultTop10
 
+Swegger
+- http://localhost:9090/swagger-ui/index.html
+
 Futuras melhorias
 - Acrescentar um LoodBalance
 - Acrescentar testes unitarios e de integração
