@@ -4,6 +4,7 @@ Para executar com docker faça os seguintes passos:
 - Abra o cmd na pasta do projeto
 - baixe a imagem do mongoDB com esse comando: docker pull mongo
 - Gere o arquivo jar com o comando: nvm install (caso de erro gere na propria IDE)
+- Rode o comando: docker build -t encurtadorlink .
 - Va ate a pasta resources e execulte o comando: docker-compose up -d
 
 ApiRest
