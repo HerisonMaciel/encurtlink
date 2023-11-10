@@ -31,21 +31,11 @@ public class EncurtadorService {
 
     public EncurtadorGeradoResponse genereteUrl(EncurtadorGeradoDTO encurtadorGeradoDTO) throws Exception {
         if(encurtadorGeradoDTO.getId_alias() != null){
-            log.info("Possui Alias: " + encurtadorGeradoDTO);
+            log.info("Requisição com Alias: " + encurtadorGeradoDTO);
             return SavaAlias(encurtadorGeradoDTO);
         }
-        log.info("Não possui Alias: " + encurtadorGeradoDTO);
+        log.info("Requisição sem Alias: " + encurtadorGeradoDTO);
         return SaveAliasRandom(encurtadorGeradoDTO);
-    }
-
-    private boolean VerificationAlias(String alias){
-        Optional<EncurtadorGerado> encurtadorGerado = encurtadorRepository.findById(alias);
-        if(encurtadorGerado.isPresent()){
-            log.info("Alias já existe!");
-            return true;
-        }
-        log.info("Alias Não existe!");
-        return false;
     }
 
     public EncurtadorGeradoResponse ConsultAlias(String alias) throws Exception {
@@ -56,10 +46,12 @@ public class EncurtadorService {
                 encurtadorGerado.setAccess(encurtadorGeradoOptional.get().getAccess()+1);
                 EncurtadorGerado encurtadorSave = encurtadorRepository.save(encurtadorGerado);
                 EncurtadorGeradoResponse encurtadorGeradoResponse = EncurtadorMapper.toResponse(encurtadorSave);
+                log.info("Alias consultado com sucesso!" + encurtadorSave.toString());
                 return encurtadorGeradoResponse;
             }
             throw new ExceptionAlias(alias, variaveisGlobais.getErrCode002(), variaveisGlobais.getDescriptionNoExists());
         }catch (ExceptionAlias e){
+            log.info("Não foi possivel consultar o Alias! " + e.toString());
             throw e;
         }
     }
@@ -71,15 +63,16 @@ public class EncurtadorService {
                 throw new ExceptionAlias(encurtadorGeradoDTO.getId_alias(), variaveisGlobais.getErrCode001(), variaveisGlobais.getDescriptionExists());
             }
         }catch (ExceptionAlias e){
+            log.info("Não foi possivel salvar o Alias! " + e.toString());
             throw e;
         }
         encurtadorGeradoDTO.setCreated_ad(LocalDateTime.now());
         EncurtadorGerado encurtadorGerado = EncurtadorMapper.toEntity(encurtadorGeradoDTO);
         EncurtadorGerado encurtadorSave = encurtadorRepository.save(encurtadorGerado);
         EncurtadorGeradoResponse encurtadorGeradoResponse = EncurtadorMapper.toResponse(encurtadorSave);
+        log.info("Alias salvo com sucesso!" + encurtadorSave.toString());
         return encurtadorGeradoResponse;
     }
-
 
     private EncurtadorGeradoResponse SaveAliasRandom(EncurtadorGeradoDTO encurtadorGeradoDTO){
 
@@ -88,18 +81,13 @@ public class EncurtadorService {
             encurtadorGeradoDTO.setId_alias(randomAlias());
             if(!VerificationAlias(encurtadorGeradoDTO.getId_alias())){
                 existe = false;
-                log.info("Alias criado com sucesso!");
             }
         }
-
         encurtadorGeradoDTO.setCreated_ad(LocalDateTime.now());
-
         EncurtadorGerado encurtadorGerado = EncurtadorMapper.toEntity(encurtadorGeradoDTO);
-
         EncurtadorGerado encurtadorSave = encurtadorRepository.save(encurtadorGerado);
-
         EncurtadorGeradoResponse encurtadorGeradoResponse = EncurtadorMapper.toResponse(encurtadorSave);
-
+        log.info("Alias salvo com sucesso!" + encurtadorSave.toString());
         return encurtadorGeradoResponse;
     }
 
@@ -113,8 +101,18 @@ public class EncurtadorService {
         String randomBase64Combination = java.util.Base64.getEncoder().encodeToString(randomBytes);
         randomBase64Combination = randomBase64Combination.substring(0, length);
         randomBase64Combination = randomBase64Combination.replace("+", "-").replace("/", "_").replace("%", "");
-
+        log.info("Alias criado Randomicamente: " + randomBase64Combination);
         return randomBase64Combination;
+    }
+
+    private boolean VerificationAlias(String alias){
+        Optional<EncurtadorGerado> encurtadorGerado = encurtadorRepository.findById(alias);
+        if(encurtadorGerado.isPresent()){
+            log.info("Alias já existe!");
+            return true;
+        }
+        log.info("Alias Não existe!");
+        return false;
     }
 
 }
