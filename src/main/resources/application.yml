@@ -1,0 +1,6 @@
+spring:
+  data:
+    mongodb:
+      database: Encurtador
+      host: encurtador
+      port: 27017
